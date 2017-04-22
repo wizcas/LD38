@@ -18,12 +18,12 @@ public class CatMover : MonoBehaviour
     void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
+        Messenger.AddListener<Vector3>("MoveTo", MoveTo);
     }
 
     // Use this for initialization
     void Start()
     {
-        Messenger.AddListener<Vector3>("MoveTo", MoveTo);
     }
 
     public void MoveTo(Vector3 dest)

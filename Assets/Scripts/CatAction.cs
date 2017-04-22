@@ -28,10 +28,15 @@ public class CatAction : MonoBehaviour
         get { return _holdingTreasure != null; }
     }
 
-    void Start()
+    void Awake()
     {
         Messenger.AddListener<Treasure>("PickUp", PickUp);
         Messenger.AddListener<Stash>("Store", Store);
+    }
+
+    void Start()
+    {
+        
     }
 
     void Update()
@@ -86,7 +91,6 @@ public class CatAction : MonoBehaviour
         {
             yield return null;
         }
-        Debug.Log("do stash");
         stash.Store(_holdingTreasure);
         _holdingTreasure = null;
     }

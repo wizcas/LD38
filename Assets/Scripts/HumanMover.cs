@@ -17,21 +17,23 @@ public class HumanMover : MonoBehaviour
     private float _nextCheckTime;
     private float _volecityCheckInterval = .1f;
 
-    private Transform _moveTarget;
-    private bool _isChasingCat;
+    private bool _isGotoTarget;
 
     void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
+        Messenger.AddListener<HumanThought>(HumanAI.HaveThoughtEvent, HaveThought);
     }
 
     void Start()
     {
-        //Messenger.AddListener("HumanStop", Stop);
-        //Messenger.AddListener("HumanResume", Resume);
-        //Messenger.AddListener<Transform>("HumanChase", ChaseCat);
 
-        Messenger.AddListener<HumanThought>(HumanAI.HaveThoughtEvent, HaveThought);
+    }
+
+    public void HaveThought(HumanThought t)
+    {
+        Debug.Log(string.Format("<color=blue>mover has thought: {0}</color>", t), this);
+        thought = t;
     }
 
     private void MoveAlongRoute(HumanPatrolThought routeThought)
@@ -45,49 +47,54 @@ public class HumanMover : MonoBehaviour
 
     void Update()
     {
-        if (Time.time > _nextCheckTime && !_agent.isStopped)
+        if (Time.time > _nextCheckTime)
         {
-            _nextCheckTime = Time.time + _volecityCheckInterval;
-            //Debug.Log("_agent is stopped");
-            if (thought is HumanPatrolThought)
+            if (_agent.isStopped)
             {
-                if (_agent.remainingDistance < _agent.radius)
-                    MoveAlongRoute((HumanPatrolThought)thought);
+                Resume();
             }
-            else if(thought is IThinkGoto)
+            else
             {
-                //_agent.destination = _moveTarget.position;
-                _agent.destination = ((IThinkGoto)thought).MoveTo.position;
+                _nextCheckTime = Time.time + _volecityCheckInterval;
+                //Debug.Log("move thought is: " + thought);
+                if (thought is HumanPatrolThought)
+                {
+                    if (_agent.remainingDistance < _agent.radius)
+                        MoveAlongRoute((HumanPatrolThought)thought);
+                }
+                else if (thought is IThinkGoto)
+                {
+                    Goto(((IThinkGoto)thought).MoveTo);
+                }
+                else
+                {
+                    Stop();
+                }
             }
         }
     }
 
-    //private void Stop()
-    //{
-    //    _agent.isStopped = true;
-    //}
-
-    //private void Resume()
-    //{
-    //    if (_isChasingCat)
-    //    {
-    //        _moveTarget = null;
-    //        _isChasingCat = false;
-    //    }
-    //    if (_agent.isStopped)
-    //        _agent.isStopped = false;
-
-    //}
-
-    //private void ChaseCat(Transform cat)
-    //{
-    //    _isChasingCat = cat != null;
-    //    _moveTarget = cat;
-    //    _agent.isStopped = false;
-    //}
-
-    private void HaveThought(HumanThought t)
+    private void Stop()
     {
-        thought = t;
+        _agent.isStopped = true;
     }
+
+    private void Resume()
+    {
+        if (_isGotoTarget)
+        {
+            _isGotoTarget = false;
+        }
+        if (_agent.isStopped)
+            _agent.isStopped = false;
+
+    }
+
+    private void Goto(Transform target)
+    {
+        _isGotoTarget = target != null;
+        _agent.destination = target.position;
+        _agent.isStopped = false;
+    }
+
 }

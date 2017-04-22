@@ -36,11 +36,11 @@ public class Route : MonoBehaviour
         _waypoints = GetComponentsInChildren<Waypoint>();        
     }
 
-    public Waypoint Next(int curIndex, int direction)
+    public Waypoint Next(ref int curIndex, ref int direction)
     {
         curIndex += direction;
-        //Debug.LogFormat("route index: {0}", _currentIndex);
-        if(curIndex >= _waypoints.Length || curIndex < 0)
+        //Debug.LogFormat("route index: {0}", curIndex);
+        if (curIndex >= _waypoints.Length || curIndex < 0)
         {
             switch (mode)
             {

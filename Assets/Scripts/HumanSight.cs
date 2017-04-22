@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(HumanAI))]
 public class HumanSight : MonoBehaviour
 {
     public float sightRangeAngle = 90f;
@@ -27,19 +28,43 @@ public class HumanSight : MonoBehaviour
     [SerializeField]
     private Color _hostileColor = Color.red;
 
+    private HumanAI _ai;
     private int _sweepDirection = 1;
     private int _prevSweepDirection;
     private Transform _stareAt;
 
+    void Awake()
+    {
+        _ai = GetComponent<HumanAI>();
+        Messenger.AddListener<HumanThought>(HumanAI.HaveThoughtEvent, HaveThought);
+    }
+
     void Start()
     {
         _prevSweepDirection = _sweepDirection;
-        Messenger.AddListener<HumanThought>(HumanAI.HaveThoughtEvent, SetSightByThought);
+    }
+
+    private void HaveThought(HumanThought thought)
+    {
+        Debug.Log(string.Format("<color=blue>sight has thought: {0}</color>", thought), this);
+        SetSightColor(thought);
+        if (thought is IThinkWatch)
+        {
+            var watch = (IThinkWatch)thought;
+            _stareAt = watch.StareAt;
+        }
+        else
+        {
+            _stareAt = null;
+            if (_sweepDirection == 0)
+                _sweepDirection = _prevSweepDirection;
+        }
     }
 
     void Update()
     {
         UpdateSight();
+        UpdateStare();        
     }
 
     private void UpdateSight()
@@ -59,35 +84,36 @@ public class HumanSight : MonoBehaviour
         }
     }
 
-    public void SetSightByThought(HumanThought thought)
+    private void UpdateStare()
     {
-        if (thought is IThinkWatch)
-        {
-            var watch = (IThinkWatch)thought;
-            if (watch.StareAt != null)
-            {
-                DoStare(watch);
-            }
-        }
-        else if (_sweepDirection == 0)
-        {
-            _sweepDirection = _prevSweepDirection;
-        }
-    }
-
-    private void DoStare(IThinkWatch thought)
-    {
+        if (_stareAt == null) return;
         if (_sweepDirection != 0) // store the prev status only if this one was sweeping sight
         {
             _prevSweepDirection = _sweepDirection;
         }
         _sweepDirection = 0;
         // turn to target
-        var targetPos = thought.StareAt.position;
+        var targetPos = _stareAt.position;
         targetPos.y = transform.position.y;
         transform.LookAt(targetPos);
         // fix eye sight
         _eyes.transform.localEulerAngles = Vector3.zero;
+    }
+
+    private void SetSightColor(HumanThought thought)
+    {
+        switch (thought.state)
+        {
+            case HumanState.Peace:
+                _sightLight.color = _peaceColor;
+                break;
+            case HumanState.Suspicious:
+                _sightLight.color = _suspiciousColor;
+                break;
+            case HumanState.Hostile:
+                _sightLight.color = _hostileColor;
+                break;
+        }
     }
 
     /*

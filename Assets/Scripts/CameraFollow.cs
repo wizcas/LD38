@@ -9,6 +9,7 @@ using UnityEngine;
 public class CameraFollow : MonoBehaviour 
 {
     public Transform target;
+    public float panSpeed = 3f;
 
     private Vector3 _offset;
 
@@ -19,6 +20,6 @@ public class CameraFollow : MonoBehaviour
 
     void Update()
     {
-        transform.position = target.position + _offset;
+        transform.position = Vector3.Lerp(transform.position, target.position + _offset, panSpeed * Time.deltaTime);
     }
 }
