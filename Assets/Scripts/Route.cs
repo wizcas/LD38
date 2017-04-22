@@ -22,13 +22,12 @@ public class Route : MonoBehaviour
 
     [SerializeField]
     private Waypoint[] _waypoints;
-    private int _currentIndex;
-    private int _direction = 1;
+    //private int _currentIndex;
+    //private int _direction = 1;
 
     void Awake()
     {
         UpdateWaypoints();
-        _currentIndex = -1;
     }
     
     [ContextMenu("Refresh Waypoints")]
@@ -37,33 +36,33 @@ public class Route : MonoBehaviour
         _waypoints = GetComponentsInChildren<Waypoint>();        
     }
 
-    public Waypoint Next()
+    public Waypoint Next(int curIndex, int direction)
     {
-        _currentIndex += _direction;
-        Debug.LogFormat("route index: {0}", _currentIndex);
-        if(_currentIndex >= _waypoints.Length || _currentIndex < 0)
+        curIndex += direction;
+        //Debug.LogFormat("route index: {0}", _currentIndex);
+        if(curIndex >= _waypoints.Length || curIndex < 0)
         {
             switch (mode)
             {
                 case Mode.OneWay:
                     return null;
                 case Mode.PingPong:
-                    _direction *= -1;
-                    _currentIndex += _direction * 2;
+                    direction *= -1;
+                    curIndex += direction * 2;
                     break;
                 case Mode.Loop:
-                    if(_direction > 0)
+                    if(direction > 0)
                     {
-                        _currentIndex = 0;
+                        curIndex = 0;
                     }
                     else
                     {
-                        _currentIndex = _waypoints.Length - 1;
+                        curIndex = _waypoints.Length - 1;
                     }
                     break;
             }
         }
-        return _waypoints[_currentIndex];
+        return _waypoints[curIndex];
     }
 
 #if UNITY_EDITOR

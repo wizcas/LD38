@@ -13,8 +13,15 @@ public class CatAction : MonoBehaviour
 
     [SerializeField]
     private Transform _mouth;
+    [SerializeField]
+    private Animator _anim;
 
-    public Treasure _holdingTreasure;
+    private Treasure _holdingTreasure;
+    public Treasure HoldingTreasure
+    {
+        get { return _holdingTreasure; }
+    }
+    private bool _isMeowing;
 
     public bool IsHoldingTreasure
     {
@@ -25,6 +32,14 @@ public class CatAction : MonoBehaviour
     {
         Messenger.AddListener<Treasure>("PickUp", PickUp);
         Messenger.AddListener<Stash>("Store", Store);
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            StartCoroutine(Meow());
+        }
     }
 
     public void PickUp(Treasure treasure)
@@ -84,5 +99,21 @@ public class CatAction : MonoBehaviour
             return false;
         }
         return true;
+    }
+
+    private IEnumerator Meow()
+    {
+        if (_isMeowing) yield break;
+        _anim.SetTrigger("Sound");
+        while (!_anim.IsInTransition(1))
+        {
+            yield return null;
+        }
+        var clipInfos = _anim.GetNextAnimatorClipInfo(1);
+        var clip = clipInfos[0].clip;
+        _isMeowing = true;
+        Messenger.Broadcast("SoundMade", transform);
+        yield return new WaitForSeconds(clip.length);
+        _isMeowing = false;
     }
 }

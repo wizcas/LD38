@@ -9,12 +9,24 @@ using UnityEngine;
 public class ClickInput : MonoBehaviour
 {
     public float raycastDistance = 20f;
+    public float fxOffsetY = .5f;
+
+    [SerializeField]
+    private ParticleSystem _clickFx;
+
     public void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
             HandleClick();
         }
+    }
+
+    private void PlayClickFx(Vector3 pos)
+    {
+        pos += Vector3.up * fxOffsetY;
+        _clickFx.transform.position = pos;
+        _clickFx.Play();
     }
 
     private void HandleClick()
@@ -30,6 +42,7 @@ public class ClickInput : MonoBehaviour
             switch (hitLayer)
             {
                 case Layers.Environment:
+                    PlayClickFx(hit.point);
                     Messenger.Broadcast("MoveTo", hit.point);
                     break;
                 case Layers.Treasure:

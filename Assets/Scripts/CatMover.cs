@@ -10,8 +10,8 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class CatMover : MonoBehaviour
 {
-
-    public float speed = 2f;
+    [SerializeField]
+    private Animator _anim;
 
     private NavMeshAgent _agent;
 
@@ -34,5 +34,25 @@ public class CatMover : MonoBehaviour
             return;
         }
         _agent.destination = dest;
+    }
+
+    void Update()
+    {
+        var offMesh = _agent.currentOffMeshLinkData;
+        var pos = transform.position;
+        pos.y = 0f;
+        var linkStartPos = offMesh.startPos;
+        linkStartPos.y = 0f;
+
+        if (_agent.isOnOffMeshLink && VectorUtils.IsAtSamePosition(pos, linkStartPos))
+        {
+            Debug.LogFormat("Link activated:\npos: {0}, nextpos: {1}, start pos: {2}, end pos: {3}", pos, _agent.nextPosition, offMesh.startPos, offMesh.endPos);
+            _anim.SetTrigger("Jump");
+        }
+        else
+        {
+            var isMoving = _agent.velocity.magnitude > .1f;
+            _anim.SetBool("Walk", isMoving);
+        }
     }
 }
