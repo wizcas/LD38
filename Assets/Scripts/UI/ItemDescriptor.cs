@@ -21,22 +21,16 @@ public class ItemDescriptor : MonoBehaviour
     {
     }
 
-    public void OnMouseEnter()
+    public void ToggleLabel(bool isOn)
     {
         if (!CanShowLabel) { return; }
 
-        _showName = true;
-    }
-
-    public void OnMouseExit()
-    {
-        if (!CanShowLabel) { return; }
-        _showName = false;
-    }
+        _showName = isOn;
+    }    
 
     void OnGUI()
     {
-        if (_showName)
+        if (_showName && CanShowLabel)
         {
             var vp = Camera.main.WorldToViewportPoint(transform.position);
             //Debug.Log(vp);

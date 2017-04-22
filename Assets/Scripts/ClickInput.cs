@@ -14,12 +14,48 @@ public class ClickInput : MonoBehaviour
     [SerializeField]
     private ParticleSystem _clickFx;
 
+    private float _mouseHoverInterval = .3f;
+    private float _nextMouseHoverCheck;
+
+    private List<ItemDescriptor> _showingTipList = new List<ItemDescriptor>();
+
+
+    void Start()
+    {
+        _nextMouseHoverCheck = Time.time;
+    }
+
     public void Update()
     {
+        CheckMouseHover();
         if (Input.GetMouseButtonDown(0))
         {
             HandleClick();
         }
+    }
+
+    private void CheckMouseHover()
+    {
+        if (Time.time < _nextMouseHoverCheck) return;
+
+        foreach (var item in _showingTipList) {
+            item.ToggleLabel(false);
+        }
+        _showingTipList.Clear();
+
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit[] hits = new RaycastHit[3];
+        int count = Physics.RaycastNonAlloc(ray, hits, raycastDistance, Layers.GetLayerMasks(Layers.Treasure, Layers.Stash));
+        for(int i = 0; i < count; i++)
+        {
+            var hit = hits[i];
+            var item = hit.collider.GetComponent<ItemDescriptor>();
+            if (item == null) continue;
+            item.ToggleLabel(true);
+            _showingTipList.Add(item);
+        }
+
+        _nextMouseHoverCheck = Time.time + _mouseHoverInterval;
     }
 
     private void PlayClickFx(Vector3 pos)

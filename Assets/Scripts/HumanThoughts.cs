@@ -25,6 +25,11 @@ public abstract class HumanThought
     public bool isFinished;
     public HumanAI owner;
 
+    protected virtual string[] Speeches
+    {
+        get { return null; }
+    }
+
     private SightTracer _tracer;
 
     public HumanThought(HumanAI owner)
@@ -74,6 +79,14 @@ public abstract class HumanThought
 
         return string.Format("<color={0}>[{1}]{2}</color>", color, GetType(), "{0}");
     }
+
+    public string RandomSpeech()
+    {
+        if (Speeches == null || Speeches.Length == 0) return null;
+
+        var rnd = UnityEngine.Random.Range(0, Speeches.Length);
+        return Speeches[rnd];
+    }
 }
 
 [System.Serializable]
@@ -83,6 +96,20 @@ public class HumanPatrolThought : HumanThought
     public int index = -1;
     public int direction = 1;
     private Waypoint _currentWaypoint;
+
+    protected override string[] Speeches
+    {
+        get
+        {
+            return new[]
+            {
+                "Hmmmmmm...",
+                "I'm so tired of working",
+                "Hope some one would love this game",
+                "48 hours of sleepless :/"
+            };
+        }
+    }
 
     public HumanPatrolThought(HumanAI owner) : base(owner)
     {
@@ -137,6 +164,22 @@ public class HumanNoticeThought : HumanThought, IThinkWatch
         }
     }
     private SightTracer _tracer;
+
+    protected override string[] Speeches
+    {
+        get
+        {
+            return new[]
+            {
+                "Hi there, my little Doggie",
+                "What's up, girl?",
+                "Come to papa ❤",
+                "Nothing stupid",
+                "I know, I know. Clean the litter, right?"
+            };
+        }
+    }
+
     public HumanNoticeThought(HumanAI owner) : base(owner)
     {
         _tracer = new SightTracer(owner);
@@ -166,6 +209,20 @@ public class HumanChaseThought : HumanThought, IThinkWatch, IThinkGoto
     public Transform moveTo;
     public Transform stareAt;
     private SightTracer _tracer;
+
+    protected override string[] Speeches
+    {
+        get
+        {
+            return new[]
+            {
+                "Hey! Give it back!",
+                "Please! I need that!",
+                "Don't you hide this one!",
+                "Good girl...And don't escape!"
+            };
+        }
+    }
 
     public Transform MoveTo
     {
@@ -218,6 +275,21 @@ public class HumanInvestigateThought : HumanThought, IThinkGoto
             return moveTo;
         }
     }
+
+    protected override string[] Speeches
+    {
+        get
+        {
+            return new[]
+            {
+                "Something wrong with this...",
+                "Doggie! I know you did this!",
+                "MLGB..(╯‵□′)╯︵┻━┻",
+                "I'm enough of this"
+            };
+        }
+    }
+
     public HumanInvestigateThought(HumanAI owner) : base(owner) { }
 
     protected override bool CheckFinished()
