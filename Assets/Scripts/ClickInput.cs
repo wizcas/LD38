@@ -58,25 +58,3 @@ public class ClickInput : MonoBehaviour
         }
     }
 }
-
-public static class Layers
-{
-    public const string Environment = "Environment";
-    public const string Treasure = "Treasure";
-    public const string Stash = "Stash";
-
-    public static int GetLayerMask(string layerName)
-    {
-        return 1 << LayerMask.NameToLayer(layerName);
-    }
-
-    public static int GetLayerMasks(params string[] layerNames)
-    {
-        var ret = 0;
-        foreach (var layerName in layerNames)
-        {
-            ret |= GetLayerMask(layerName);
-        }
-        return ret;
-    }
-}

@@ -1,0 +1,89 @@
+﻿/************************************
+** Created by Wizcas (wizcas.me)
+************************************/
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+[ExecuteInEditMode]
+public class Route : MonoBehaviour 
+{
+    public enum Mode
+    {
+        OneWay,
+        PingPong,
+        Loop
+    }
+
+    public Mode mode;
+
+    [SerializeField]
+    private Waypoint[] _waypoints;
+    private int _currentIndex;
+    private int _direction = 1;
+
+    void Awake()
+    {
+        UpdateWaypoints();
+        _currentIndex = -1;
+    }
+    
+    [ContextMenu("Refresh Waypoints")]
+    private void UpdateWaypoints()
+    {
+        _waypoints = GetComponentsInChildren<Waypoint>();        
+    }
+
+    public Waypoint Next()
+    {
+        _currentIndex += _direction;
+        Debug.LogFormat("route index: {0}", _currentIndex);
+        if(_currentIndex >= _waypoints.Length || _currentIndex < 0)
+        {
+            switch (mode)
+            {
+                case Mode.OneWay:
+                    return null;
+                case Mode.PingPong:
+                    _direction *= -1;
+                    _currentIndex += _direction * 2;
+                    break;
+                case Mode.Loop:
+                    if(_direction > 0)
+                    {
+                        _currentIndex = 0;
+                    }
+                    else
+                    {
+                        _currentIndex = _waypoints.Length - 1;
+                    }
+                    break;
+            }
+        }
+        return _waypoints[_currentIndex];
+    }
+
+#if UNITY_EDITOR
+    void OnTransformChildrenChanged()
+    {
+        UpdateWaypoints();
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.blue;
+        for (int i = 0; i < _waypoints.Length; i++)
+        {
+            var waypoint = _waypoints[i];
+            waypoint.OnDrawGizmosSelected();
+            if(i > 0)
+            {
+                Gizmos.DrawLine(waypoint.transform.position, _waypoints[i - 1].transform.position);
+            }
+        }
+#endif
+    }
+}

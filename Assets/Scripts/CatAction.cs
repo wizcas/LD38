@@ -16,6 +16,11 @@ public class CatAction : MonoBehaviour
 
     public Treasure _holdingTreasure;
 
+    public bool IsHoldingTreasure
+    {
+        get { return _holdingTreasure != null; }
+    }
+
     void Start()
     {
         Messenger.AddListener<Treasure>("PickUp", PickUp);
@@ -73,7 +78,7 @@ public class CatAction : MonoBehaviour
 
     private bool ValidateHolding()
     {
-        if (_holdingTreasure == null)
+        if (!IsHoldingTreasure)
         {
             Debug.LogError("You're not holding any treasure.");
             return false;
