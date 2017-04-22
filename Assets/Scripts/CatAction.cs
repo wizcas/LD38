@@ -116,7 +116,9 @@ public class CatAction : MonoBehaviour
         var clipInfos = _anim.GetNextAnimatorClipInfo(1);
         var clip = clipInfos[0].clip;
         _isMeowing = true;
-        Messenger.Broadcast("SoundMade", transform);
+        var soundSource = new GameObject("Meow");
+        soundSource.transform.position = transform.position;
+        Messenger.Broadcast("SoundMade", soundSource.transform);
         yield return new WaitForSeconds(clip.length);
         _isMeowing = false;
     }

@@ -2,7 +2,10 @@
 ** Created by Wizcas (wizcas.me)
 ************************************/
 
-using DG.Tweening;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -52,6 +55,10 @@ public class HumanAI : MonoBehaviour
     private void OnSoundMade(Transform source)
     {
         if (VectorUtils.SqrDistance(source.position, transform.position) > hearDistance * hearDistance) return;
+        PushThought(new HumanInvestigateThought(this)
+        {
+            moveTo = source
+        });
     }
 
     void Update()
@@ -80,7 +87,7 @@ public class HumanAI : MonoBehaviour
                 stareAt = cat.transform
             });
     }
-    #region obsoleted
+#region obsoleted
     //private bool DetectCat(Transform eyes)
     //{
     //    var sightAngle = eyes.transform.localEulerAngles.y;
@@ -109,7 +116,7 @@ public class HumanAI : MonoBehaviour
     //    }
     //    return false;
     //}
-    #endregion
+#endregion
 
     private void PushThought(HumanThought thought)
     {
@@ -136,6 +143,14 @@ public class HumanAI : MonoBehaviour
     private void UpdateThoughtList()
     {
         _editorThoughts = _thoughts.Select(t => t.ToString()).ToArray();
+    }
+
+    private void OnDrawGizmos()
+    {
+#if UNITY_EDITOR
+        Handles.color = Color.magenta;
+        Handles.DrawWireArc(transform.position, Vector3.up, Vector3.forward, 360, hearDistance);
+#endif
     }
 }
 

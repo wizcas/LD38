@@ -19,6 +19,22 @@ public class HumanMover : MonoBehaviour
 
     private bool _isGotoTarget;
 
+    public bool IsNearDestination
+    {
+        get
+        {
+            return _agent.remainingDistance < _agent.radius;
+        }
+    }
+
+    public bool IsStandingStill
+    {
+        get
+        {
+            return _agent.velocity == Vector3.zero;
+        }
+    }
+
     void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
@@ -59,7 +75,7 @@ public class HumanMover : MonoBehaviour
                 //Debug.Log("move thought is: " + thought);
                 if (thought is HumanPatrolThought)
                 {
-                    if (_agent.remainingDistance < _agent.radius)
+                    if (IsNearDestination)
                         MoveAlongRoute((HumanPatrolThought)thought);
                 }
                 else if (thought is IThinkGoto)

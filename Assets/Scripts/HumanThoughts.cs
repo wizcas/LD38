@@ -222,7 +222,7 @@ public class HumanInvestigateThought : HumanThought, IThinkGoto
 
     protected override bool CheckFinished()
     {
-        throw new NotImplementedException();
+        return owner.GetComponent<HumanMover>().IsStandingStill;
     }
 
     public override string ToString()
