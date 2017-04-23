@@ -35,8 +35,8 @@ public class ItemDescriptor : MonoBehaviour
         {
             var vp = Camera.main.ScreenToViewportPoint(Input.mousePosition);
             //Debug.Log(vp);
-            var width = 200f;
-            var height = 60;
+            var width = 220f;
+            var height = 65;
             var offset = new Vector2(5, 5);
             var xPos = Screen.width * vp.x;
             var yPos = Screen.height * (1 - vp.y);
