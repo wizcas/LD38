@@ -12,6 +12,20 @@ using UnityEngine.UI;
 
 public class GameOverScreen : UIBehaviour 
 {
+    [SerializeField]
+    private CollectionItem _itemPrefab;
+
+    [SerializeField]
+    private Text _txtCollectionTitle;
+    [SerializeField]
+    private Text _txtNothing;
+
+    [SerializeField]
+    private Transform _collectionRoot;
+
+    [SerializeField]
+    private Stash _stash;
+
 	protected override void Awake()
     {
         Messenger.AddListener("GameOver", GameOver);
@@ -19,13 +33,43 @@ public class GameOverScreen : UIBehaviour
 
     protected override void Start()
     {
-        GetComponent<CanvasGroup>().alpha = 0f;
         gameObject.SetActive(false);
+        GetComponent<CanvasGroup>().alpha = 0f;
+        SetAlpha(_txtCollectionTitle, 0f);
+        SetAlpha(_txtNothing, 0f);
+    }
+
+    private void SetAlpha(Graphic g, float alpha)
+    {
+        var color = g.color;
+        color.a = 0f;
+        g.color = color;
     }
 
     private void GameOver()
     {
         gameObject.SetActive(true);
-        GetComponent<CanvasGroup>().DOFade(1f, 1f);
+        GetComponent<CanvasGroup>().DOFade(1f, 1f).OnComplete(()=>
+        {
+            StartCoroutine(Statistic());
+        });
+    }
+
+    private IEnumerator Statistic()
+    {
+        yield return _txtCollectionTitle.DOFade(1f, 1f).WaitForCompletion();
+        if (_stash.inventory.Count > 0)
+        {
+            foreach (var i in _stash.inventory)
+            {
+                var item = Instantiate(_itemPrefab, _collectionRoot, false);
+                item.Init(i);
+                yield return item.Show().WaitForCompletion();
+            }
+        }
+        else
+        {
+            yield return _txtNothing.DOFade(1f, 1f).WaitForCompletion();
+        }
     }
 }
