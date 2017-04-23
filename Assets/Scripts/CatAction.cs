@@ -16,12 +16,16 @@ public class CatAction : MonoBehaviour
     [SerializeField]
     private Animator _anim;
 
+    public HideSpot hideSpot;
+    public bool isHiding;
+
+    private bool _isMeowing;
+
     private Treasure _holdingTreasure;
     public Treasure HoldingTreasure
     {
         get { return _holdingTreasure; }
     }
-    private bool _isMeowing;
 
     public bool IsHoldingTreasure
     {
@@ -32,6 +36,8 @@ public class CatAction : MonoBehaviour
     {
         Messenger.AddListener<Treasure>("PickUp", PickUp);
         Messenger.AddListener<Stash>("Store", Store);
+        Messenger.AddListener<HideSpot>("ToHideSpot", ToHideSpot);
+        Messenger.AddListener("EnterHideSpot", EnterHideSpot);
     }
 
     void Start()
@@ -39,19 +45,11 @@ public class CatAction : MonoBehaviour
         
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            StartCoroutine(Meow());
-        }
-    }
-
     public void PickUp(Treasure treasure)
     {
-        Messenger.Broadcast("MoveTo", treasure.transform.position);
+        Messenger.Broadcast("CatMoveTo", treasure.transform.position);
         StopAllCoroutines();
-        StartCoroutine(PickUpCo(treasure));        
+        StartCoroutine(PickUpCo(treasure));
     }
 
     private IEnumerator PickUpCo(Treasure treasure)
@@ -78,7 +76,7 @@ public class CatAction : MonoBehaviour
 
     public void Store(Stash stash)
     {
-        Messenger.Broadcast("MoveTo", stash.transform.position);
+        Messenger.Broadcast("CatMoveTo", stash.transform.position);
         if (!ValidateHolding())
             return;
         StopAllCoroutines();
@@ -103,6 +101,44 @@ public class CatAction : MonoBehaviour
             return false;
         }
         return true;
+    }
+
+    private void ToHideSpot(HideSpot spot)
+    {
+        if (hideSpot != null)
+        {
+            hideSpot.Disable();
+        }
+
+        hideSpot = spot;
+        Messenger.Broadcast("CatMoveTo", spot.EntrancePos);
+    }
+
+    private void EnterHideSpot()
+    {
+        Messenger.Broadcast("CatStop");
+        _anim.gameObject.SetActive(false);
+        isHiding = true;
+    }
+
+    public void ExitHideSpot()
+    {
+        _anim.gameObject.SetActive(true);
+        if (hideSpot != null)
+        {
+            transform.position = hideSpot.EntrancePos;
+            hideSpot.Disable();
+        }
+        hideSpot = null;
+        isHiding = false;
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            StartCoroutine(Meow());
+        }
     }
 
     private IEnumerator Meow()

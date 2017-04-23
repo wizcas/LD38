@@ -45,7 +45,7 @@ public class ClickInput : MonoBehaviour
 
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit[] hits = new RaycastHit[3];
-        int count = Physics.RaycastNonAlloc(ray, hits, raycastDistance, Layers.GetLayerMasks(Layers.Treasure, Layers.Stash));
+        int count = Physics.RaycastNonAlloc(ray, hits, raycastDistance, Layers.GetLayerMasks(Layers.Treasure, Layers.Stash, Layers.HideOut));
         for(int i = 0; i < count; i++)
         {
             var hit = hits[i];
@@ -70,7 +70,7 @@ public class ClickInput : MonoBehaviour
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, raycastDistance,
-            Layers.GetLayerMasks(Layers.Environment, Layers.Treasure, Layers.Stash)
+            Layers.GetLayerMasks(Layers.Environment, Layers.Treasure, Layers.Stash, Layers.HideOut)
             ))
         {
             Debug.LogFormat("hit on: {0}", hit.collider.name);
@@ -79,7 +79,8 @@ public class ClickInput : MonoBehaviour
             {
                 case Layers.Environment:
                     PlayClickFx(hit.point);
-                    Messenger.Broadcast("MoveTo", hit.point);
+                    var to = hit.point;
+                    Messenger.Broadcast("CatMoveTo", to);
                     break;
                 case Layers.Treasure:
                     var treasure = hit.collider.GetComponent<Treasure>();
@@ -102,6 +103,8 @@ public class ClickInput : MonoBehaviour
                     {
                         Messenger.Broadcast("Store", stash);
                     }
+                    break;
+                case Layers.HideOut:
                     break;
             }
         }

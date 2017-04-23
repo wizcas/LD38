@@ -15,10 +15,22 @@ public class CatMover : MonoBehaviour
 
     private NavMeshAgent _agent;
 
+    private bool isStopped
+    {
+        get { return _agent.isStopped && !enabled; }
+        set
+        {
+            _agent.isStopped = value;
+            enabled = !value;
+        }
+    }
+
     void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
-        Messenger.AddListener<Vector3>("MoveTo", MoveTo);
+        Messenger.AddListener<Vector3>("CatMoveTo", MoveTo);
+        Messenger.AddListener("CatStop", Stop);
+        Messenger.AddListener("CatResume", Resume);
     }
 
     // Use this for initialization
@@ -34,10 +46,27 @@ public class CatMover : MonoBehaviour
             return;
         }
         _agent.destination = dest;
+        Resume();
+    }
+
+    private void Stop()
+    {
+        if (isStopped) return;
+        isStopped = true;
+        _agent.destination = transform.position;
+    }
+
+    private void Resume()
+    {
+        if (!isStopped) return;
+        GetComponent<CatAction>().ExitHideSpot();
+        isStopped = false;
     }
 
     void Update()
     {
+        if (_agent.isStopped) return;
+
         var offMesh = _agent.currentOffMeshLinkData;
         var pos = transform.position;
         pos.y = 0f;

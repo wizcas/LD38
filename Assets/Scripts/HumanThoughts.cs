@@ -50,7 +50,7 @@ public abstract class HumanThought
             Debug.Log(string.Format("<color=red>Thought {0} is Finished</color>", GetType()), owner);
         }
 
-        if (_tracer.IsInSight(owner.eyes, owner.cat.transform))
+        if (_tracer.IsInSight(owner.eyes, owner.cat.transform) && !owner.cat.isHiding)
         {
             Messenger.Broadcast("CatInSight");
         }
@@ -187,7 +187,7 @@ public class HumanNoticeThought : HumanThought, IThinkWatch
 
     protected override bool CheckFinished()
     {
-        return !_tracer.IsInSight(owner.eyes, StareAt);
+        return !_tracer.IsInSight(owner.eyes, StareAt) || owner.cat.isHiding;
     }
 
     public override string ToString()
@@ -246,7 +246,7 @@ public class HumanChaseThought : HumanThought, IThinkWatch, IThinkGoto
 
     protected override bool CheckFinished()
     {
-        return !_tracer.IsInSight(owner.eyes, StareAt);
+        return !_tracer.IsInSight(owner.eyes, StareAt) || owner.cat.isHiding;
     }
 
     public override string ToString()
