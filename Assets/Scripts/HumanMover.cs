@@ -51,7 +51,6 @@ public class HumanMover : MonoBehaviour
     {
         Debug.Log(string.Format("<color=blue>mover has thought: {0}</color>", t), this);
         thought = t;
-        Debug.Log(t.speed);
         if(t.speed >= 0)
         {
             _agent.speed = t.speed;

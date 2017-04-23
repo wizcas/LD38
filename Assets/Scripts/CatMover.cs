@@ -2,6 +2,7 @@
 ** Created by Wizcas (wizcas.me)
 ************************************/
 
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,9 +12,13 @@ using UnityEngine.AI;
 public class CatMover : MonoBehaviour
 {
     [SerializeField]
-    private Animator _anim;
+    private CatJumping _catAnim;
 
     private NavMeshAgent _agent;
+    
+    private Vector3 _jumpEnd;
+    private bool _isJumping;
+    private Vector3 _prevDestination;
 
     private bool isStopped
     {
@@ -36,6 +41,7 @@ public class CatMover : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        _catAnim.onAnimatorMove += AfterAnim;
     }
 
     public void MoveTo(Vector3 dest)
@@ -45,6 +51,7 @@ public class CatMover : MonoBehaviour
         {
             return;
         }
+        _prevDestination = dest;
         _agent.destination = dest;
         Resume();
     }
@@ -63,7 +70,7 @@ public class CatMover : MonoBehaviour
         isStopped = false;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (_agent.isStopped) return;
 
@@ -73,15 +80,59 @@ public class CatMover : MonoBehaviour
         var linkStartPos = offMesh.startPos;
         linkStartPos.y = 0f;
 
-        if (_agent.isOnOffMeshLink && VectorUtils.IsAtSamePosition(pos, linkStartPos))
+        if (!_isJumping)
         {
-            Debug.LogFormat("Link activated:\npos: {0}, nextpos: {1}, start pos: {2}, end pos: {3}", pos, _agent.nextPosition, offMesh.startPos, offMesh.endPos);
-            _anim.SetTrigger("Jump");
+            if (_agent.isOnOffMeshLink)
+            {
+                Debug.LogFormat("Link activated:\npos: {0}, nextpos: {1}, start pos: {2}, end pos: {3}", pos, _agent.nextPosition, offMesh.startPos, offMesh.endPos);
+
+                var animTrigger = "Jump";
+                if ((offMesh.endPos.y - offMesh.startPos.y) < -.2f)
+                    animTrigger = "Drop";
+
+                Debug.LogFormat("anim trigger: {0}, {1}", animTrigger, offMesh.endPos.y - offMesh.startPos.y);
+                BeforeJump(offMesh.endPos);
+                _catAnim.Anim.SetTrigger(animTrigger);                
+            }
+            else
+            {
+                var isMoving = _agent.velocity.magnitude > .1f;
+                _agent.updatePosition = true;
+                _catAnim.Anim.SetBool("Walk", isMoving);
+            }
         }
-        else
-        {
-            var isMoving = _agent.velocity.magnitude > .1f;
-            _anim.SetBool("Walk", isMoving);
-        }
+    }
+
+    void AfterAnim()
+    {
+        
+    }
+
+    void BeforeJump(Vector3 jumpEnd)
+    {
+        _jumpEnd = jumpEnd;
+        _isJumping = true;
+        _agent.updatePosition = false;
+        //isStopped = true;
+        //_agent.destination = transform.position;
+    }
+
+    void AfterJump()
+    {
+        _agent.nextPosition = _jumpEnd;
+        _isJumping = false;
+        //isStopped = false;
+        _agent.destination = _prevDestination;
+
+    }
+
+    void DoJump(float duration)
+    {
+        DOTween.Sequence()
+            .Append(transform.DOMove(_jumpEnd, duration))        
+            .OnComplete(()=>
+            {
+                AfterJump();
+            });        
     }
 }
