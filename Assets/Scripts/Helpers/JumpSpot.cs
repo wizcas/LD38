@@ -10,10 +10,8 @@ using UnityEngine.AI;
 [RequireComponent(typeof(OffMeshLink))]
 public class JumpSpot : MonoBehaviour 
 {
-    private OffMeshLink _link;
     void Awake()
     {
-        _link = GetComponent<OffMeshLink>();
         var renderers = GetComponentsInChildren<Renderer>();
         if(renderers != null)
         {

@@ -78,7 +78,8 @@ public class HumanAI : MonoBehaviour
             {
                 state = HumanState.Hostile,
                 moveTo = cat.transform,
-                stareAt = cat.transform
+                stareAt = cat.transform,
+                speed = 4f
             });
         else
             PushThought(new HumanNoticeThought(this)

@@ -10,8 +10,8 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class HumanMover : MonoBehaviour
 {
-    //public Route route;
     public HumanThought thought;
+    public float defaultSpeed = 2f;
 
     private NavMeshAgent _agent;
     private float _nextCheckTime;
@@ -38,6 +38,7 @@ public class HumanMover : MonoBehaviour
     void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
+        _agent.speed = defaultSpeed;
         Messenger.AddListener<HumanThought>(HumanAI.HaveThoughtEvent, HaveThought);
     }
 
@@ -50,6 +51,15 @@ public class HumanMover : MonoBehaviour
     {
         Debug.Log(string.Format("<color=blue>mover has thought: {0}</color>", t), this);
         thought = t;
+        Debug.Log(t.speed);
+        if(t.speed >= 0)
+        {
+            _agent.speed = t.speed;
+        }
+        else
+        {
+            _agent.speed = defaultSpeed;
+        }
     }
 
     private void MoveAlongRoute(HumanPatrolThought routeThought)

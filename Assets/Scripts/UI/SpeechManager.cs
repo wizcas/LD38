@@ -12,7 +12,7 @@ public class SpeechManager : UIBehaviour
     [SerializeField]
     private TextBubble _bubblePrefab;
 
-    void Awake()
+    protected override void Awake()
     {
         Messenger.AddListener<HumanThought>(HumanAI.HaveThoughtEvent, HaveThought);
     }

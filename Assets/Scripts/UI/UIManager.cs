@@ -9,4 +9,12 @@ using UnityEngine;
 public class UIManager : Singleton<UIManager> 
 {
     public Canvas canvas;
+
+    void Awake()
+    {
+        foreach(Transform t in transform)
+        {
+            t.gameObject.SetActive(true);
+        }
+    }
 }

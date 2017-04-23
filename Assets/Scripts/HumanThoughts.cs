@@ -24,6 +24,7 @@ public abstract class HumanThought
     public HumanState state;
     public bool isFinished;
     public HumanAI owner;
+    public float speed = -1;
 
     protected virtual string[] Speeches
     {

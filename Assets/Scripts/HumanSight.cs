@@ -27,15 +27,13 @@ public class HumanSight : MonoBehaviour
     private Color _suspiciousColor = Color.yellow;
     [SerializeField]
     private Color _hostileColor = Color.red;
-
-    private HumanAI _ai;
+    
     private int _sweepDirection = 1;
     private int _prevSweepDirection;
     private Transform _stareAt;
 
     void Awake()
     {
-        _ai = GetComponent<HumanAI>();
         Messenger.AddListener<HumanThought>(HumanAI.HaveThoughtEvent, HaveThought);
     }
 
