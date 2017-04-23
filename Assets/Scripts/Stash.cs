@@ -12,6 +12,7 @@ public class Stash : ItemDescriptor
 {
     [SerializeField]
     private Transform _treasureRoot;
+
     public List<Treasure> inventory = new List<Treasure>();
     public List<Treasure> collectibles = new List<Treasure>();
     public float acceptingRange = 1.2f;
@@ -40,7 +41,7 @@ public class Stash : ItemDescriptor
         treasure.transform.SetParent(transform, false);
         treasure.gameObject.SetActive(false);
         onStashUpdated.Invoke(this);
-
+        
         if (collectibles.Contains(treasure))
         {
             collectibles.Remove(treasure);
