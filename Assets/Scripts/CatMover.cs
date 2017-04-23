@@ -22,11 +22,10 @@ public class CatMover : MonoBehaviour
 
     private bool isStopped
     {
-        get { return _agent.isStopped && !enabled; }
+        get { return _agent.isStopped; }
         set
         {
             _agent.isStopped = value;
-            enabled = !value;
         }
     }
 
@@ -65,7 +64,7 @@ public class CatMover : MonoBehaviour
 
     private void Resume()
     {
-        if (!isStopped) return;
+        if (!isStopped) return;        
         GetComponent<CatAction>().ExitHideSpot();
         isStopped = false;
     }
@@ -97,7 +96,6 @@ public class CatMover : MonoBehaviour
             else
             {
                 var isMoving = _agent.velocity.magnitude > .1f;
-                _agent.updatePosition = true;
                 _catAnim.Anim.SetBool("Walk", isMoving);
             }
         }
@@ -112,17 +110,12 @@ public class CatMover : MonoBehaviour
     {
         _jumpEnd = jumpEnd;
         _isJumping = true;
-        _agent.updatePosition = false;
-        //isStopped = true;
-        //_agent.destination = transform.position;
     }
 
     void AfterJump()
     {
-        _agent.nextPosition = _jumpEnd;
         _isJumping = false;
-        //isStopped = false;
-        _agent.destination = _prevDestination;
+        _agent.CompleteOffMeshLink();
 
     }
 
