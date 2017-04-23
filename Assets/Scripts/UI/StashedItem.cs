@@ -10,10 +10,10 @@ using UnityEngine.UI;
 public class StashedItem : MonoBehaviour 
 {
     [SerializeField]
-    private Text _txtName;
+    private Image _imgIcon;
 
-    public void Init(Treasure desc)
+    public void Init(Treasure treasure)
     {
-        _txtName.text = desc.title;
+        _imgIcon.sprite = treasure.icon;
     }
 }

@@ -2,6 +2,7 @@
 ** Created by Wizcas (wizcas.me)
 ************************************/
 
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ public class Treasure : ItemDescriptor
     private Rigidbody _rigidBody;
 
     private bool _isPickedUp;
+
+    public Sprite icon;
 
     public bool IsPickedUp
     {

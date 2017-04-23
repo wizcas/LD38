@@ -51,7 +51,7 @@ public class ItemDescriptor : MonoBehaviour
                 screenPos.y -= height + offset.y * 2;
             }
 
-            string text = string.Format("=== {0} ===\n", title.ToUpper());
+            string text = string.Format("=== {0} ===\n\n", title.ToUpper());
             text += description;
 
             GUI.skin = UIManager.Instance.tooltipSkin;

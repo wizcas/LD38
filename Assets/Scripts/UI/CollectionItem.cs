@@ -18,6 +18,7 @@ public class CollectionItem : MonoBehaviour
     public void Init(Treasure treasure)
     {
         _txtName.text = treasure.title;
+        _imgIcon.sprite = treasure.icon;
         GetComponent<CanvasGroup>().alpha = 0f;
     }
 
