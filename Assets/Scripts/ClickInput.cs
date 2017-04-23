@@ -19,6 +19,10 @@ public class ClickInput : MonoBehaviour
 
     private List<ItemDescriptor> _showingTipList = new List<ItemDescriptor>();
 
+    void Awake()
+    {
+        Messenger.AddListener("GameOver", ()=> { enabled = false; });
+    }
 
     void Start()
     {

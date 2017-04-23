@@ -26,11 +26,11 @@ public class HideSpotEntrance : MonoBehaviour
         isHidingIn = false;
     }
 
-    void OnTriggerEnter(Collider collider)
+    void OnTriggerEnter(Collider other)
     {
         if (isHidingIn) return;
         
-        var cat = collider.GetComponent<CatAction>();
+        var cat = other.GetComponent<CatAction>();
         if (cat == null) return;
 
         Messenger.Broadcast("EnterHideSpot");
