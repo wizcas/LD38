@@ -33,7 +33,7 @@ public class ItemDescriptor : MonoBehaviour
     {
         if (_showName && CanShowLabel)
         {
-            var vp = Camera.main.WorldToViewportPoint(transform.position);
+            var vp = Camera.main.ScreenToViewportPoint(Input.mousePosition);
             //Debug.Log(vp);
             var width = 200f;
             var height = 60;
@@ -42,8 +42,18 @@ public class ItemDescriptor : MonoBehaviour
             var yPos = Screen.height * (1 - vp.y);
             var screenPos = new Vector2(xPos, yPos) + offset;
 
+            if(screenPos.x + width > Screen.width)
+            {
+                screenPos.x -= width + offset.x * 2;
+            }
+            if(screenPos.y + height > Screen.height)
+            {
+                screenPos.y -= height + offset.y * 2;
+            }
+
             string text = string.Format("[{0}]\n", title);
             text += description;
+
             GUI.Box(new Rect(screenPos, new Vector2(width, height)), text);
         }
     }
