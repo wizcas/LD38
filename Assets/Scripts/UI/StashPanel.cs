@@ -13,11 +13,7 @@ public class StashPanel : MonoBehaviour
 
     public void Clear()
     {
-        for(int i = transform.childCount - 1; i >= 0; i--)
-        {
-            var child = transform.GetChild(i).gameObject;
-            Destroy(child);
-        }
+        transform.DestroyAllChildren();
     }
 
     public void UpdateItems(Stash stash)

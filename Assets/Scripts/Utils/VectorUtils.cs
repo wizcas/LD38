@@ -1,9 +1,6 @@
 ﻿/************************************
 ** Created by Wizcas (wizcas.me)
 ************************************/
-
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public static class VectorUtils
@@ -28,6 +25,22 @@ public static class VectorUtils
             angle = angle - 360f;
         }
         return angle;
+    }
+
+    public static void DestroyAllChildren(this Transform transform)
+    {
+        for(int i = transform.childCount - 1; i >= 0; i--)
+        {
+            var child = transform.GetChild(i);
+            if (!Application.isPlaying)
+            {
+                Object.DestroyImmediate(child.gameObject);
+            }
+            else
+            {
+                Object.Destroy(child.gameObject);
+            }
+        }
     }
 }
 
