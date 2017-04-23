@@ -51,10 +51,12 @@ public class ItemDescriptor : MonoBehaviour
                 screenPos.y -= height + offset.y * 2;
             }
 
-            string text = string.Format("[{0}]\n", title);
+            string text = string.Format("=== {0} ===\n", title.ToUpper());
             text += description;
 
+            GUI.skin = UIManager.Instance.tooltipSkin;
             GUI.Box(new Rect(screenPos, new Vector2(width, height)), text);
+            GUI.skin = null;
         }
     }
 }
