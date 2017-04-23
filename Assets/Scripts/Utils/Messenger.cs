@@ -28,6 +28,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 static internal class Messenger
 {
@@ -353,11 +354,15 @@ public sealed class MessengerHelper : MonoBehaviour
     void Awake()
     {
         DontDestroyOnLoad(gameObject);
+        SceneManager.sceneUnloaded += (scene) =>
+        {
+            Messenger.Cleanup();
+        };
     }
 
-    //Clean up eventTable every time a new level loads.
-    public void OnLevelWasLoaded(int unused)
-    {
-        Messenger.Cleanup();
-    }
+    ////Clean up eventTable every time a new level loads.
+    //public void OnLevelWasLoaded(int unused)
+    //{
+    //    Messenger.Cleanup();
+    //}
 }

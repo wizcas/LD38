@@ -21,7 +21,7 @@ public class ClickInput : MonoBehaviour
 
     void Awake()
     {
-        Messenger.AddListener("GameOver", ()=> { enabled = false; });
+        Messenger.AddListener<bool>("GameOver", isWin => { enabled = false; });
     }
 
     void Start()

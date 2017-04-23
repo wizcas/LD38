@@ -8,12 +8,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameOverScreen : UIBehaviour 
 {
     [SerializeField]
     private CollectionItem _itemPrefab;
+
+    [SerializeField]
+    private GameObject _winTitle;
+    [SerializeField]
+    private GameObject _failTitle;
 
     [SerializeField]
     private Text _txtCollectionTitle;
@@ -26,9 +32,12 @@ public class GameOverScreen : UIBehaviour
     [SerializeField]
     private Stash _stash;
 
+    [SerializeField]
+    private GameObject _btnRestart;
+
 	protected override void Awake()
     {
-        Messenger.AddListener("GameOver", GameOver);
+        Messenger.AddListener<bool>("GameOver", GameOver);
     }
 
     protected override void Start()
@@ -37,6 +46,7 @@ public class GameOverScreen : UIBehaviour
         GetComponent<CanvasGroup>().alpha = 0f;
         SetAlpha(_txtCollectionTitle, 0f);
         SetAlpha(_txtNothing, 0f);
+        _btnRestart.SetActive(false);
     }
 
     private void SetAlpha(Graphic g, float alpha)
@@ -46,8 +56,10 @@ public class GameOverScreen : UIBehaviour
         g.color = color;
     }
 
-    private void GameOver()
+    private void GameOver(bool isWin)
     {
+        _winTitle.SetActive(isWin);
+        _failTitle.SetActive(!isWin);
         gameObject.SetActive(true);
         GetComponent<CanvasGroup>().DOFade(1f, 1f).OnComplete(()=>
         {
@@ -71,5 +83,11 @@ public class GameOverScreen : UIBehaviour
         {
             yield return _txtNothing.DOFade(1f, 1f).WaitForCompletion();
         }
+        _btnRestart.SetActive(true);
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene(0);
     }
 }

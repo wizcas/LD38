@@ -27,6 +27,6 @@ public class HumanCatcher : MonoBehaviour
         if (cat == null) return;
 
         Debug.LogFormat("<color=red><size=12>Game Over.</size></color>");
-        Messenger.Broadcast("GameOver");
+        Messenger.Broadcast("GameOver", false);
     }
 }

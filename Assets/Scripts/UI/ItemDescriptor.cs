@@ -19,6 +19,7 @@ public class ItemDescriptor : MonoBehaviour
 
     protected virtual void Awake()
     {
+        Messenger.AddListener<bool>("GameOver", isWin => { ToggleLabel(false); });
     }
 
     public void ToggleLabel(bool isOn)
