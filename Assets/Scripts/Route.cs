@@ -83,6 +83,7 @@ public class Route : MonoBehaviour
                 Gizmos.DrawLine(waypoint.transform.position, _waypoints[i - 1].transform.position);
             }
         }
-#endif
     }
+#endif
+
 }
