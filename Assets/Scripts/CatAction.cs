@@ -10,11 +10,14 @@ public class CatAction : MonoBehaviour
 {
     public float pickUpDistance = .4f;
     public float stashDistance = 1.2f;
+    public AudioClip meowClip;
 
     [SerializeField]
     private Transform _mouth;
     [SerializeField]
     private Animator _anim;
+    [SerializeField]
+    private AudioSource _audioSrc;
 
     public HideSpot hideSpot;
     public bool isHiding;
@@ -158,7 +161,8 @@ public class CatAction : MonoBehaviour
         var soundSource = new GameObject("Meow");
         soundSource.transform.position = transform.position;
         Messenger.Broadcast("SoundMade", soundSource.transform);
-        yield return new WaitForSeconds(1f);
+        _audioSrc.PlayOneShot(meowClip);
+        yield return new WaitForSeconds(meowClip.length);
         _isMeowing = false;
     }
 }
