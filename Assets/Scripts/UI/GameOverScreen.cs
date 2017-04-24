@@ -58,6 +58,7 @@ public class GameOverScreen : UIBehaviour
 
     private void GameOver(bool isWin)
     {
+        Messenger.RemoveListener<bool>("GameOver", GameOver);
         _winTitle.SetActive(isWin);
         _failTitle.SetActive(!isWin);
         gameObject.SetActive(true);

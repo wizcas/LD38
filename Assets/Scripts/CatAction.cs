@@ -58,6 +58,9 @@ public class CatAction : MonoBehaviour
         {
             yield return null;
         }
+
+        PutDown();
+
         treasure.transform.SetParent(_mouth, true);
         treasure.transform.localPosition = Vector3.zero;
         _holdingTreasure = treasure;
@@ -68,7 +71,7 @@ public class CatAction : MonoBehaviour
     {
         if (!ValidateHolding())
             return;
-        StopAllCoroutines();
+        //StopAllCoroutines();
         _holdingTreasure.transform.SetParent(null);
         _holdingTreasure.IsPickedUp = false;
         _holdingTreasure = null;
