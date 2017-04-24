@@ -134,12 +134,6 @@ public class HumanPatrolThought : HumanThought
         return _currentWaypoint == null;
     }
 
-    public override void Update()
-    {
-        base.Update();
-
-    }
-
     public override string ToString()
     {
         return string.Format(base.ToString(), route);
@@ -268,6 +262,7 @@ public class HumanChaseThought : HumanThought, IThinkWatch, IThinkGoto
 public class HumanInvestigateThought : HumanThought, IThinkGoto
 {
     public Transform moveTo;
+    public bool isTempTarget;
 
     public Transform MoveTo
     {
@@ -295,7 +290,12 @@ public class HumanInvestigateThought : HumanThought, IThinkGoto
 
     protected override bool CheckFinished()
     {
-        return owner.GetComponent<HumanMover>().IsStandingStill;
+        var isFinished = owner.GetComponent<HumanMover>().IsStandingStill;
+        if (isFinished && isTempTarget)
+        {
+            UnityEngine.Object.Destroy(moveTo.gameObject);
+        }
+        return isFinished;
     }
 
     public override string ToString()

@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ClickInput : MonoBehaviour
 {
-    public float raycastDistance = 20f;
+    public float raycastDistance = 50f;
     public float fxOffsetY = .5f;
 
     [SerializeField]
@@ -49,7 +49,7 @@ public class ClickInput : MonoBehaviour
 
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit[] hits = new RaycastHit[3];
-        int count = Physics.RaycastNonAlloc(ray, hits, raycastDistance, Layers.GetLayerMasks(Layers.Treasure, Layers.Stash, Layers.HideOut));
+        int count = Physics.RaycastNonAlloc(ray, hits, Layers.GetLayerMasks(Layers.Treasure, Layers.Stash, Layers.HideOut));
         for(int i = 0; i < count; i++)
         {
             var hit = hits[i];
@@ -73,7 +73,7 @@ public class ClickInput : MonoBehaviour
     {
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, raycastDistance,
+        if (Physics.Raycast(ray, out hit, 
             Layers.GetLayerMasks(Layers.Environment, Layers.Treasure, Layers.Stash, Layers.HideOut)
             ))
         {

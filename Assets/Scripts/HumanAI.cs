@@ -57,7 +57,8 @@ public class HumanAI : MonoBehaviour
         if (VectorUtils.SqrDistance(source.position, transform.position) > hearDistance * hearDistance) return;
         PushThought(new HumanInvestigateThought(this)
         {
-            moveTo = source
+            moveTo = source,
+            isTempTarget = true
         });
     }
 
