@@ -264,6 +264,10 @@ public class HumanInvestigateThought : HumanThought, IThinkGoto
     public Transform moveTo;
     public bool isTempTarget;
 
+    public float investigateDuration = 3f;
+
+    private float investigateEndTime;
+
     public Transform MoveTo
     {
         get
@@ -286,16 +290,37 @@ public class HumanInvestigateThought : HumanThought, IThinkGoto
         }
     }
 
-    public HumanInvestigateThought(HumanAI owner) : base(owner) { }
+    public HumanInvestigateThought(HumanAI owner) : base(owner) {
+        investigateEndTime = float.NaN;
+    }
 
     protected override bool CheckFinished()
     {
-        var isFinished = owner.GetComponent<HumanMover>().IsStandingStill;
-        if (isFinished && isTempTarget)
+        var mover = owner.GetComponent<HumanMover>();
+
+        if (mover.IsStandingStill)
+        {
+            if (float.IsNaN(investigateEndTime))
+            {
+                investigateEndTime = Time.time + investigateDuration;
+            }
+        }
+        else
+        {
+            return false;
+        }
+
+        // Make sure the human stops for certain time
+        if (Time.time < investigateEndTime)
+        {
+            return false;
+        }
+                
+        if (isTempTarget)
         {
             UnityEngine.Object.Destroy(moveTo.gameObject);
         }
-        return isFinished;
+        return true;
     }
 
     public override string ToString()

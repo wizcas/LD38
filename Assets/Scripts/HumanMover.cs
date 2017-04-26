@@ -17,6 +17,8 @@ public class HumanMover : MonoBehaviour
     private float _nextCheckTime;
     private float _volecityCheckInterval = .1f;
 
+    private bool isThoughtInit;
+
     private bool _isGotoTarget;
 
     public bool IsNearDestination
@@ -34,7 +36,7 @@ public class HumanMover : MonoBehaviour
             return _agent.velocity == Vector3.zero;
         }
     }
-
+    
     void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
@@ -51,7 +53,9 @@ public class HumanMover : MonoBehaviour
     {
         Debug.Log(string.Format("<color=blue>mover has thought: {0}</color>", t), this);
         thought = t;
-        if(t.speed >= 0)
+        isThoughtInit = true;
+
+        if (t.speed >= 0)
         {
             _agent.speed = t.speed;
         }
@@ -64,7 +68,6 @@ public class HumanMover : MonoBehaviour
     private void MoveAlongRoute(HumanPatrolThought routeThought)
     {
         if (routeThought == null || routeThought.route == null) return;
-        //Debug.LogFormat("{0}: to next waypoint", name);
         var wp = routeThought.NextWaypoint();
         if (wp == null) return;
         _agent.destination = wp.Position;
@@ -78,24 +81,21 @@ public class HumanMover : MonoBehaviour
             {
                 Resume();
             }
+            _nextCheckTime = Time.time + _volecityCheckInterval;
+            if (thought is HumanPatrolThought)
+            {
+                if (isThoughtInit || IsNearDestination)
+                    MoveAlongRoute((HumanPatrolThought)thought);
+            }
+            else if (thought is IThinkGoto)
+            {
+                Goto(((IThinkGoto)thought).MoveTo);
+            }
             else
             {
-                _nextCheckTime = Time.time + _volecityCheckInterval;
-                //Debug.Log("move thought is: " + thought);
-                if (thought is HumanPatrolThought)
-                {
-                    if (IsNearDestination)
-                        MoveAlongRoute((HumanPatrolThought)thought);
-                }
-                else if (thought is IThinkGoto)
-                {
-                    Goto(((IThinkGoto)thought).MoveTo);
-                }
-                else
-                {
-                    Stop();
-                }
+                Stop();
             }
+            isThoughtInit = false;
         }
     }
 

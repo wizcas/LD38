@@ -15,10 +15,9 @@ public class CatMover : MonoBehaviour
     private CatJumping _catAnim;
 
     private NavMeshAgent _agent;
-    
+
     private Vector3 _jumpEnd;
     private bool _isJumping;
-    private Vector3 _prevDestination;
 
     private bool isStopped
     {
@@ -50,7 +49,6 @@ public class CatMover : MonoBehaviour
         {
             return;
         }
-        _prevDestination = dest;
         _agent.destination = dest;
         Resume();
     }
@@ -64,7 +62,7 @@ public class CatMover : MonoBehaviour
 
     private void Resume()
     {
-        if (!isStopped) return;        
+        if (!isStopped) return;
         GetComponent<CatAction>().ExitHideSpot();
         isStopped = false;
     }
@@ -91,7 +89,7 @@ public class CatMover : MonoBehaviour
 
                 Debug.LogFormat("anim trigger: {0}, {1}", animTrigger, offMesh.endPos.y - offMesh.startPos.y);
                 BeforeJump(offMesh.endPos);
-                _catAnim.Anim.SetTrigger(animTrigger);                
+                _catAnim.Anim.SetTrigger(animTrigger);
             }
             else
             {
@@ -103,13 +101,18 @@ public class CatMover : MonoBehaviour
 
     void AfterAnim()
     {
-        
+
     }
 
     void BeforeJump(Vector3 jumpEnd)
     {
         _jumpEnd = jumpEnd;
         _isJumping = true;
+        _agent.updateRotation = false;
+
+        var toDir = Vector3.ProjectOnPlane(_jumpEnd - transform.position, Vector3.up);        
+        var rot = Quaternion.LookRotation(toDir, Vector3.up);        
+        transform.DORotateQuaternion(rot, .3f);
     }
 
     void AfterJump()
@@ -121,11 +124,13 @@ public class CatMover : MonoBehaviour
 
     void DoJump(float duration)
     {
+
         DOTween.Sequence()
-            .Append(transform.DOMove(_jumpEnd, duration))        
-            .OnComplete(()=>
+            .Append(transform.DOMove(_jumpEnd, duration))
+            .OnComplete(() =>
             {
+                _agent.updateRotation = true;
                 AfterJump();
-            });        
+            });
     }
 }
