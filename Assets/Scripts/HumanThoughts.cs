@@ -338,36 +338,70 @@ public class HumanInvestigateThought : HumanThought, IThinkGoto
 
 public class SightTracer
 {
+    private const float scanDeltaAngle = 15f;
     private HumanAI _owner;
     public SightTracer(HumanAI owner)
     {
         _owner = owner;
     }
 
+    private float minSightAngle
+    {
+        get { return -_owner.sightRangeAngle * .5f; }
+    }
+
+    private float maxSightAngle
+    {
+        get { return _owner.sightRangeAngle * .5f; }
+    }
+
     public bool IsInSight(Transform eyes, Transform target)
     {
         var sightAngle = eyes.transform.localEulerAngles.y;
-        var sightRange = new Vector2(
-            VectorUtils.NormalizeAngle(sightAngle - _owner.sightRangeAngle * .5f),
-            VectorUtils.NormalizeAngle(sightAngle + _owner.sightRangeAngle * .5f)
-            );
-        var catRelDir = target.position - _owner.transform.position;
+        var catRelDir = target.position - eyes.position;
         catRelDir.y = 0;
-        var catAngle = VectorUtils.NormalizeAngle(Vector3.Angle(catRelDir, _owner.transform.forward));
+        var catAngle = VectorUtils.NormalizeAngle(Vector3.Angle(catRelDir, eyes.forward));
         //Debug.LogFormat("SightRange: {0}, Cat Angle: {1}", sightRange, catAngle);
-        bool isCatInRange = catAngle >= sightRange.x && catAngle <= sightRange.y;
+        bool isCatInSightAngle = catAngle >= minSightAngle && catAngle <= maxSightAngle;
         bool isCatNearEnough = catRelDir.magnitude <= _owner.detectDistance;
         //Debug.LogFormat("Cat In Range? {0}, Cat In Distance? {1}({2})", isCatInRange, isCatNearEnough, catRelDir.magnitude);
-        if (isCatInRange && isCatNearEnough) // raycast only if the cat is in sight range, in the consideration of performance.
+        if (isCatInSightAngle && isCatNearEnough) // raycast only if the cat is in sight range, in the consideration of performance.
         {
-            // TODO: not accurate
-            var catDir = target.position - _owner.transform.position;
-            var sightRay = new Ray(_owner.transform.position, catDir);
-            Debug.DrawRay(_owner.transform.position, catDir, Color.red);
-            RaycastHit hit;
-            if (Physics.Raycast(sightRay, out hit, _owner.detectDistance))
+            return ScanSight(eyes, target);
+        }
+        return false;
+    }
+
+    private bool ScanSight(Transform eyes, Transform target)
+    {
+
+        var scanCount = Mathf.RoundToInt(_owner.sightRangeAngle / scanDeltaAngle) + 1;
+        var forward = eyes.forward;
+        forward.y = 0;
+
+        for (int x = 0; x < scanCount; x++)
+        {
+            var horizontalAngle = minSightAngle + scanDeltaAngle * x;
+            //Debug.Log("x: " + xAngle);
+            for (int y = 0; y < scanCount; y++)
             {
-                return hit.collider.transform == target;
+                var verticalAngle = minSightAngle + scanDeltaAngle * y;
+                //Debug.Log("y: " + yAngle);
+                //var rayDir = Quaternion.Euler(xAngle, yAngle, 0f) * forward;
+                var rayDir = Quaternion.AngleAxis(verticalAngle, Vector3.right) * Quaternion.AngleAxis(horizontalAngle, Vector3.up) * forward;
+
+                var sightRay = new Ray(eyes.position, rayDir);
+                Debug.DrawRay(eyes.position, rayDir, Color.black);
+                RaycastHit hit;
+
+                if (Physics.Raycast(sightRay, out hit, _owner.detectDistance, Layers.GetLayerMasks(Layers.Cat, Layers.Environment, Layers.Wall)))
+                {
+                    if (hit.collider.transform == target)
+                    {
+                        Debug.DrawLine(eyes.position, hit.point, Color.red);
+                        return true;
+                    }
+                }
             }
         }
         return false;

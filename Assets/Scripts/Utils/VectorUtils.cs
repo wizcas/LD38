@@ -53,6 +53,7 @@ public static class Layers
     public const string Cat = "Cat";
     public const string Human = "Human";
     public const string HideOut = "HideOut";
+    public const string Wall = "Wall";
 
     public static int GetLayerMask(string layerName)
     {
